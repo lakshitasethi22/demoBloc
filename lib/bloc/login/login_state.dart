@@ -1,3 +1,4 @@
+import 'dart:convert';
 part of 'login_bloc.dart';
 
 enum LoginStatus { initial, loading, success, error }
@@ -9,17 +10,30 @@ class LoginState extends Equatable {
   final bool isPasswordValid;
   final LoginStatus loginStatus;
   final String message;
-  final List<dynamic> userData;
+  final List userData;
 
   LoginState({
     this.email = '',
     this.password = '',
-    this.isEmailValid = true,
-    this.isPasswordValid = true,
+    this.isEmailValid = false,
+    this.isPasswordValid = false,
     this.loginStatus = LoginStatus.initial,
     this.message = '',
     this.userData = const [],
   });
+  factory LoginState.fromJson(String source) {
+    final data = json.decode(source);
+    return LoginState(
+      userData: data is List ? data : [],
+      loginStatus: LoginStatus.success,
+    );
+  }
+  Map<String,dynamic> toJson() {
+    final result = <String, dynamic>{};
+
+    result.addAll({'email': email});
+    return result;
+  }
 
   LoginState copyWith({
     String? email,
@@ -28,7 +42,7 @@ class LoginState extends Equatable {
     bool? isPasswordValid,
     LoginStatus? loginStatus,
     String? message,
-    List<dynamic>? userData,
+    List? userData,
   }) {
     return LoginState(
       email: email ?? this.email,
@@ -42,13 +56,5 @@ class LoginState extends Equatable {
   }
 
   @override
-  List<Object> get props => [
-    email,
-    password,
-    isEmailValid,
-    isPasswordValid,
-    loginStatus,
-    message,
-    userData,
-  ];
+  List<Object> get props => [email, password, isEmailValid, isPasswordValid, loginStatus, message, userData];
 }

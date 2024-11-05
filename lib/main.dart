@@ -11,7 +11,7 @@ void main() async {
 
   final prefs = await SharedPreferences.getInstance();
   final bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-  Map<String, dynamic>? userData; // Change to Map<String, dynamic>
+  Map<String, dynamic>? userData;
 
   // Load user data if logged in
   if (isLoggedIn) {
@@ -26,8 +26,8 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final bool isLoggedIn;
-  final Map<String, dynamic>? userData; // Change to Map<String, dynamic>?
-
+  final Map<String, dynamic>? userData;
+  // Future<LoginState> fetchLoginapi = LoginBloc(Client()).fetchLoginApi();
   MyApp({required this.isLoggedIn, required this.userData});
 
   @override
@@ -36,8 +36,8 @@ class MyApp extends StatelessWidget {
       title: 'Login Demo',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: BlocProvider(
-        create: (context) => LoginBloc(), // Provide the LoginBloc
-        child: isLoggedIn && userData != null // Check if userData is not null
+        create: (context) => LoginBloc(),
+        child: isLoggedIn && userData != null
             ? UserDetailsScreen(userData: userData!)
             : LoginScreen(),
       ),

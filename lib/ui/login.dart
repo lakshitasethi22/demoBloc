@@ -51,6 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
               BlocBuilder<LoginBloc, LoginState>(
                 builder: (context, state) {
                   return TextFormField(
+                    key: Key('emailField'),
                     keyboardType: TextInputType.emailAddress,
                     focusNode: emailFocusNode,
                     decoration: InputDecoration(
@@ -74,6 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
               BlocBuilder<LoginBloc, LoginState>(
                 builder: (context, state) {
                   return TextFormField(
+                    key: Key('passwordField'),
                     obscureText: !_isPasswordVisible,
                     decoration: InputDecoration(
                       hintText: 'Password',
@@ -103,12 +105,27 @@ class _LoginScreenState extends State<LoginScreen> {
                   );
                 },
               ),
+              const SizedBox(height: 20),
+              BlocBuilder<LoginBloc, LoginState>(
+                builder: (context, state) {
+                  if (state.loginStatus == LoginStatus.error) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: Text(
+                        state.message,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink(); // No error message to show
+                },
+              ),
               const SizedBox(height: 50),
               BlocListener<LoginBloc, LoginState>(
                 listener: (context, state) async {
                   if (state.loginStatus == LoginStatus.success) {
                     try {
-                      final userData = await fetchUserData(state.email); // Fetch specific user data based on email
+                      final userData = await fetchUserData(state.email);
                       final prefs = await SharedPreferences.getInstance();
                       await prefs.setBool('isLoggedIn', true);
                       await prefs.setString('userData', jsonEncode(userData));
@@ -128,6 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: BlocBuilder<LoginBloc, LoginState>(
                   builder: (context, state) {
                     return ElevatedButton(
+                      key:  Key('loginButton'),
                       onPressed: () {
                         context.read<LoginBloc>().add(LoginApi());
                       },
@@ -147,19 +165,18 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-  String get uri =>'https://reqres.in/api/users';
-      Future<Map<String, dynamic>> fetchUserData(String email) async {
-    final response = await http.get(Uri.parse('uri'));
+
+  Future<Map<String, dynamic>> fetchUserData(String email) async {
+    final response = await http.get(Uri.parse('https://reqres.in/api/users'));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final users = data['data'] as List;
 
-
       final user = users.firstWhere((user) => user['email'] == email, orElse: () => null);
 
       if (user != null) {
-        return user;
+        return user; // Return the user data
       } else {
         throw Exception('User not found');
       }

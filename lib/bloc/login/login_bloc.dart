@@ -16,7 +16,19 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   String get uri => 'https://reqres.in/api/login';
+  Future<LoginState> fetchLoginApi() async {
+    // Simulated API URL
+    final url = Uri.parse(uri);
+    final response = await http.get(url); // Replace with actual login API
 
+    if (response.statusCode == 200) {
+      // Simulating a successful response
+      return LoginState.fromJson(response.body);
+    } else {
+      // Simulating an error response
+      throw Exception('Failed to load user data');
+    }
+  }
   void _onEmailChanged(EmailChanged event, Emitter<LoginState> emit) {
     emit(
       state.copyWith(
